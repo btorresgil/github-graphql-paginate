@@ -1,0 +1,47 @@
+{
+  "name": "github-graphql-paginate",
+  "version": "1.0.0",
+  "author": "Brian Torres-Gil <brian@ixi.us> (https://github.com/btorresgil)",
+  "description": "Easily fetch multiple pages from the GitHub GraphQL API",
+  "main": "dist/github-graphql-paginate.cjs.js",
+  "module": "dist/github-graphql-paginate.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "license": "ISC",
+  "scripts": {
+    "test": "jest --detectOpenHandles --coverage --verbose",
+    "test:watch": "npm run test -- --watchAll",
+    "build": "rollup -c",
+    "watch": "rollup -cw",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "github",
+    "graphql",
+    "api",
+    "paginate"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/btorresgil/github-graphql-paginate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/btorresgil/github-graphql-paginate/issues"
+  },
+  "homepage": "https://github.com/btorresgil/github-graphql-paginate",
+  "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.24.0",
+    "eslint-config-prettier": "^8.2.0",
+    "jest": "^26.6.3",
+    "rollup": "^2.45.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
+  }
+}
