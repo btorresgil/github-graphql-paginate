@@ -2,13 +2,13 @@
  * Type for part of response with list of nodes
  *
  */
-type GraphqlClientResponseNodes = {
+type GraphqlClientResponseItems<T> = {
   pageInfo: {
     hasNextPage: boolean
     endCursor: string | null
   }
-  edges: { [key: string]: any }[]
-  nodes: { [key: string]: any }[]
+  edges?: T[]
+  nodes?: T[]
 }
 
 /**
@@ -18,8 +18,8 @@ type GraphqlClientResponseNodes = {
  */
 export type GraphqlClient = (
   query: string,
-  variables: { [key: string]: any },
-) => Promise<any>
+  variables: { [key: string]: unknown },
+) => Promise<unknown>
 
 /**
  * Helper function to remove carriage returns and effect syntax highlighting to
@@ -44,12 +44,12 @@ export function gql(string: TemplateStringsArray): string {
  * @returns {*} - The item at the path in the object, or defaultValue if the
  * path isn't resolvable
  */
-export const resolvePath = (
-  object: any,
+export const resolvePath = <T>(
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
+  obj: any,
   path: string,
-  defaultValue?: any,
-): GraphqlClientResponseNodes =>
-  path.split('.').reduce((o, p) => (o ? o[p] : defaultValue), object)
+  defaultValue?: T,
+): T => path.split('.').reduce((o, p) => (o ? o[p] : defaultValue), obj)
 
 /**
  * Fetches all items from a paginated GraphQL query.
@@ -67,27 +67,30 @@ export const resolvePath = (
  * page. Should be null on first call to this function.
  * @returns {Promise<Array>} - Array of all nodes from all pages
  */
-export const graphqlPaginate = async (
+export const graphqlPaginate = async <T>(
   graphqlClient: GraphqlClient,
   query: string,
   pathToNodes: string,
-  queryVariables: { [key: string]: any } = {},
+  queryVariables: { [key: string]: unknown } = {},
   endCursor: string | null = null,
-): Promise<any[]> => {
+): Promise<T[]> => {
   const response = await graphqlClient(query, { ...queryVariables, endCursor })
   // TODO: Add error checking here
   const {
     edges,
     nodes,
     pageInfo: { hasNextPage, endCursor: newEndCursor },
-  } = resolvePath(response, pathToNodes)
+  } = resolvePath<GraphqlClientResponseItems<T>>(response, pathToNodes)
   const items = edges || nodes
+  if (!items) {
+    throw new Error(`Couldn't find 'edges' or 'nodes' at path`)
+  }
   if (!hasNextPage) {
     return items
   }
   return [
     ...items,
-    ...(await graphqlPaginate(
+    ...(await graphqlPaginate<T>(
       graphqlClient,
       query,
       pathToNodes,
